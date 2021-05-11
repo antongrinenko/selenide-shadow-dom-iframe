@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SelenideShadowDomIframe</title>
+</head>
+<body>
+<h2>Shadow DOM</h2>
+<div id="shadow-host"></div>
+
+
+
+<script type="text/javascript">
+
+    /*
+        function findInShadows(root, shadowRoots, leaf) {
+          if (shadowRoots.length === 0) {
+            return Array.from(root.querySelectorAll(leaf));
+          }
+
+          const nextSelector = shadowRoots[0];
+          const otherSelectors = shadowRoots.slice(1);
+
+          return Array.from(root.querySelectorAll(nextSelector)).map(function(childShadowRoot) {
+            return findInShadows(childShadowRoot.shadowRoot, otherSelectors, leaf);
+          }).flat();
+        }
+    */
+
+    function newElement(tag, attributes, text) {
+        const element = document.createElement(tag);
+        Object.keys(attributes).forEach(function (attributeName) {
+            element.setAttribute(attributeName, attributes[attributeName]);
+        });
+        if (text) {
+            element.appendChild(document.createTextNode(text));
+        }
+        return element;
+    }
+
+    function appendChildItem(shadowContainer, clazz, text) {
+        const shadowContainerChildHost = newElement('div', {'class': clazz});
+        const shadowContainerChild = shadowContainerChildHost.attachShadow({mode: "open"});
+
+        const shadowContainerChildItem = newElement('div', {'class': clazz + '-item'});
+        shadowContainerChildItem.appendChild(newElement('p', {}, text));
+        shadowContainerChild.appendChild(shadowContainerChildItem);
+
+        shadowContainer.appendChild(shadowContainerChildHost);
+        return shadowContainerChild;
+    }
+
+    function createInput(id) {
+        const input = document.createElement("input");
+        input.setAttribute("id", id);
+        input.setAttribute("type", "text");
+        return input;
+    }
+
+    function createButton(id, text) {
+        const button = document.createElement("button");
+        button.setAttribute("id", id);
+        button.textContent = text;
+        button.onclick = function() {this.textContent = "Changed " + text;};
+        return button;
+    }
+
+    const shadow = document.getElementById('shadow-host').attachShadow({mode: "open"});
+
+    shadow.appendChild(newElement('p', {}, 'Inside Shadow-DOM'));
+    shadow.appendChild(newElement('iframe', {'id': 'inner-shadow-frame', 'src':'frame.html'}));
+</script>
+
+
+</body>
+</html>
